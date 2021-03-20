@@ -860,6 +860,168 @@
 
 
 
+## 工具包
+
+### SQuirreL SQL Client 
+
+- http://www.squirrelsql.org/
+
+
+
+### Maven
+
+使用命令：
+
+- 编译命令：mvn clean package -U
+- 启动命令：java -jar xxx-SNAPSHOT-war-exec.jar 
+
+
+
+
+
+## 书籍
+
+- GoF23 Patterns
+- 2003 - J2EE Core Patterns 
+- Java Specification Requests
+  - https://github.com/mercyblitz/jsr
+  - https://www.jcp.org/en/jsr/all
+- Apache Digester 
+  - http://commons.apache.org/proper/commons-digester/
+- 
+
+
+
+
+
+## Java EE 项目 
+
+### Java EE 单体架构 
+
+#### 主要内容
+
+1. 总体目标
+2. 项目需求说明
+3. 迭代 v1： 需求实现
+4. 迭代 v2： 日志管理
+5. 问答互动 
+
+
+
+#### 总体目标
+
+- 理解需求描述， 并深度探讨潜在需求
+- 掌握 Java 生态系统、 企业级架构和技术规范
+- 学会使用 Java 标准技术栈实现互联网平台项目 
+
+
+
+#### 项目需求
+
+- 功能需求
+  - 用户注册
+    - 用户名注册
+    - 邮箱注册
+    - 手机注册
+  - 用户登录
+    - 用户名登录
+    - 邮箱登录
+    - 手机登录 
+- 非功能需求
+  - 系统架构
+  - 单体架构 
+
+
+
+#### V1：需求实现
+
+- 技术栈
+  - 应用容器
+    - Servlet Engine - Apache Tomcat 8+
+  - Web 服务
+    - 基于 Servlet 实现的自研 MVC 框架， 支持 JAX-RS 注解
+  - 数据存储
+    - 基于 JDBC 实现 
+- Servlet 概念
+  - Servlet 是一种基于 Java 技术的 Web 组件， 用于生成动态内容， 由容器管理。 
+  - 类似于其他 Java 技术组件， Servlet 是平台无关的 Java 类组成， 并且由 Java Web 服务器加载执行。
+  -  通常情况， 由 Servlet 容器提供运行时环境。 Servlet 容器， 有时候也称作为Servlet 引擎， 作为Web服务器或应用服务器的一部分。 
+  - 通过请求和响应对话， 提供Web 客户端与 Servlets 交互的能力。 容器管理Servlets实例以及它们的生命周期。 
+- Servlet 主要版本 
+
+| 规范版本    | 发布时间      | Java 平台 | 主要更新                                          |
+| ----------- | ------------- | --------- | ------------------------------------------------- |
+| Servlet 4.0 | 2017 年 9 月  | Java EE 8 | 支持 HTTP/2                                       |
+| Servlet 3.1 | 2013 年 5 月  | Java EE 7 | 非阻塞 I/O、HTTP协议更新机制（WebSocket）         |
+| Servlet 3.0 | 2009 年 12 月 | Java EE 6 | 可插拔、简化部署、异步Servlet、安全、文件上传     |
+| Servlet 2.5 | 2005 年 9 月  | Java EE 5 | Annotation 支持                                   |
+| Servlet 2.4 | 2003 年 11 月 | J2EE 1.4  | web.xml 支持 XML Scheme                           |
+| Servlet 2.3 | 2001 年 8 月  | J2EE 1.3  | 新增 Filter，事件/监听器，Wrapper                 |
+| Servlet 2.2 | 1999 年 8 月  | J2EE 1.2  | 作为 J2EE 的一部分，以 .war 文件作为独立 web 应用 |
+
+- Servlet 核心 API
+
+| 核心组件 API                              | 说明                          | 起始版本 | Spring Framework 代表实现         |
+| ----------------------------------------- | ----------------------------- | -------- | --------------------------------- |
+| javax.servlet.Servlet                     | 动态内容组件                  | 1.0      | DispatcherServlet                 |
+| javax.servlet.Filter                      | Servlet 过滤器                | 2.3      | CharacterEncodingFilter           |
+| javax.servlet.ServletContext              | Servlet 应用上下文            |          |                                   |
+| javax.servlet.AsyncContext                | 异步上下文                    | 3.0      |                                   |
+| javax.servlet.ServletContextListener      | ServletContext 生命周期监听器 | 2.3      | ContextLoaderListener             |
+| javax.servlet.ServletRequestListener      | ServletRequest 生命周期监听器 | 2.3      | RequestContextListener            |
+| javax.servlet.http.HttpSessionListener    | HttpSession 生命周期监听器    | 2.3      | HttpSessionMutexListener          |
+| javax.servlet.AsyncListener               | 异步上下文监听器              | 3.0      | StanderdServletAsyncWebRequest    |
+| javax.servlet.ServletContainerInitializer | Servlet 容器初始化器          | 3.0      | SpringServletContainerInitializer |
+
+- Servlet 组件注册方式
+  - 传统 web.xml 注册方式
+  - 注解注册方式（ Servlet 3.0+）
+  - 编码注册方式（ Servlet 3.0+） 
+- Servlet 生命周期
+  - 声明（ 应用行为）
+  - 注册（ 容器行为）
+  - 初始化： Servlet#init(ServletConfig)
+  - 服务： Servlet#service(ServletRequest, ServletResponse)
+  - 销毁： Servlet#destroy() 
+- Filter 生命周期
+  - 声明（ 应用行为）
+  - 注册（ 容器行为）
+  - 初始化： Filter#init(FilterConfig)
+  - 过滤: Filter#doFilter(ServletRequest,ServletResponse,FilterChain)
+  - 销毁： Filter#destroy() 
+- ServletContext 生命周期
+  - 声明（ 应用行为）
+  - 注册（ 容器行为）
+  - 初始化： ServletContextListener#contextInitialized
+  - 销毁： ServletContextListener#contextDestroyed 
+- Servlet 3.1 规范重点章节
+  - CHAPTER 2 The Servlet Interface
+  - CHAPTER 3 The Request
+  - CHAPTER 4 Servlet Context
+  - CHAPTER 5 The Response
+  -  CHAPTER 9 Dispatching Requests
+  - CHAPTER 11Application Lifecycle Events
+  - CHAPTER 12 Mapping Requests to Servlets 
+- EL 概念
+  - EL是Expression Language的英文缩写（ 表达式语言） ,原来是为了方便存储数据所自定义的语言。 
+  - 当时呢， 只能在JSTL1.0的标签中使用， 现在已经成为了JSP2.0的规范之一， 已经成为了一项成熟的、 标准的技术。
+  - EL表达式规定为： eval-expression 和 literal-expression,同时EL表达式支持Compositeexpressions 
+- EL 语法支持
+  - 表达式： 取值表达式、 字面值表达式、 组合表达式
+  - 操作符号[]和.
+  - 操作符： 算术操作符、 关系操作符(ralational operator)、 逻辑操作符(logic operator)、 空值操作符(empty operator)、 条件操作符(conditonal operator)
+  - 隐藏对象(hidden object)
+  - EL函数(EL function) 
+- JSTL 概念
+  - JSTL全名为JSP Standard Tag Libaray(JSP标准标签函数库),目前主流的版本为1.2,它是由JCP( Java Commnunity Process)制定的标准规范,提供给我们一个标准通用的标签函数库， 主要分为5大类：
+    - 核心标签库（ Core)
+    - I18N格式标签库(I18N-capable format tab libaray)
+    - SQL标签库(SQL tag libaray)
+    - XML标签库(XML tag libaray)
+    - 函数标签库(Functions tag libaray) 
+- 自研 Web MVC 框架 - 模型 
+
+![1616246497642](JavaProject.assets/1616246497642.png)
 
 
 
@@ -867,6 +1029,154 @@
 
 
 
+#### V2：日志管理
+
+- 技术栈
+  - Servlet Logging API
+    - ServletContext#log 方法
+  - Java Logging API
+    - java.util.logging.Logger 
+
+
+
+
+
+#### Servlet
+
+- API 使用
+- 整体架构设计
+
+
+
+##### Servlet Forward 技术
+
+- 实例一：Spring Framework Web DefaultServletHttpRequestHandler   forword   到容器文件 Servlet 实例
+- 实例二：自研 Web MVC 框架
+- 实例三：Spring WebMVC 模板渲染 
+
+Servlet Forward 它是转发请求到下一个 Servlet，Servlet Forward 是否会转发到 Filter 上去？ 
+
+答案：Servlet Forward 会转发到 Filter 上，只需要在 web.xml 中的 <filter-mapping> 内部使用 dispatcher 就可以实现。
+
+
+
+##### 自研 Web MVC 框架
+
+- 控制器接口：Controller
+  - 页面渲染 Controller：PageController（继承 Controller）
+  - REST Body Controller：RestController （继承 Controller） 
+
+
+
+##### Servlet 处理静态内容
+
+- Tomcat ： org.apache.catalina.servlets.DefaultServlet
+- Jetty
+- Weblogic
+- WebSphere 
+
+> 关联一个问题：为什么Spring Boot 将 CSS 和 JS 文件放 在 static 目录下，可以读取被读取
+>
+> org.springframework.web.servlet.resource.DefaultServletHttpRequestHandler
+>
+> - Tomcat（JBoss）
+> - Jetty
+> - Resin
+> - WebLogic
+> - WebSphere 
+
+
+
+##### Servlet  基于线程
+
+- CGI - 基于进程，PHP，Apache Httpd， 都是基于进程
+- Servlet - 基于线程
+  - Struts 1 和 2
+  - Spring Web MVC
+  - JSF 
+
+
+
+
+
+#### JSP
+
+- JSP 就是 Servlet 扩展
+- 通过模板代码 -> Servlet 字节码 （在打包的时候，就可以自动生成）
+
+
+
+
+
+#### 流行前端框架
+
+- vue.js
+- ReactJS
+
+需要编译
+
+- NodeJS
+
+源代码 翻译 --> js 代码
+
+
+
+
+
+#### Java 归档文件
+
+- zip
+  - jar : Java Archiever
+  - war: Web Archiever
+  - ear: Enterprise Archiever 
+
+
+
+#### 请求参数的坑
+
+- http://www.acb.com/def?a=1&a=2&a=3 
+- 有多个重复的 param 的时候，
+  - getParameter() 返回 第一个 匹配到的内容，是一个 string  类型数据
+  - getParameterNames() 返回所有的内容，是一个 枚举 Enumeration 类型数据
+
+```java
+// ServletRequest.class
+
+    /**
+     * ...
+     * <p>If you use this method with a multivalued
+     * parameter, the value returned is equal to the first value
+     * in the array returned by <code>getParameterValues</code>.
+     *
+     * ... 
+     * @see #getParameterValues
+     */
+    public String getParameter(String name);
+    
+    public Enumeration<String> getParameterNames();
+```
+
+
+
+#### Tomcat NIO 模型
+
+- 请求头（Head）
+- 请求体（Body） 
+- http://tomcat.apache.org/tomcat-8.5-doc/config/http.html#Connector_Comparison
+
+|                                 | Java Nio Connector NIO | Java Nio2 Connector NIO2 | APR/native Connector APR |
+| :------------------------------ | :--------------------: | :----------------------: | ------------------------ |
+| Classname                       |  `Http11NioProtocol`   |   `Http11Nio2Protocol`   | `Http11AprProtocol`      |
+| Tomcat Version                  |      since 6.0.x       |       since 8.0.x        | since 5.5.x              |
+| Support Polling                 |          YES           |           YES            | YES                      |
+| Polling Size                    |    `maxConnections`    |     `maxConnections`     | `maxConnections`         |
+| Read Request Headers            |      Non Blocking      |       Non Blocking       | Non Blocking             |
+| Read Request Body               |        Blocking        |         Blocking         | Blocking                 |
+| Write Response Headers and Body |        Blocking        |         Blocking         | Blocking                 |
+| Wait for next Request           |      Non Blocking      |       Non Blocking       | Non Blocking             |
+| SSL Support                     |  Java SSL or OpenSSL   |   Java SSL or OpenSSL    | OpenSSL                  |
+| SSL Handshake                   |      Non blocking      |       Non blocking       | Blocking                 |
+| Max Connections                 |    `maxConnections`    |     `maxConnections`     | `maxConnections`         |
 
 
 
@@ -874,25 +1184,7 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+### 数据存储之 JDBC 
 
 
 
