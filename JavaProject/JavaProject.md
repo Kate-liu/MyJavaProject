@@ -877,6 +877,12 @@
 
 
 
+### MyBatis
+
+- MyBatis Generator 通过数据库表结构生成 Java 代码和 SQL Mapper 
+
+
+
 
 
 ## 书籍
@@ -1185,6 +1191,189 @@ Servlet Forward 它是转发请求到下一个 Servlet，Servlet Forward 是否�
 
 
 ### 数据存储之 JDBC 
+
+#### Java Database Connectivity（JDBC） 
+
+- 概念
+  - JDBC(Java DataBase Connectivity，java数据库连接)是一种用于执行SQL语句的Java API，可以为多种关系数据库提供统一访问，它由一组用Java语言编写的类和接口组成。
+  - JDBC提供了一种基准，据此可以构建更高级的工具和接口，使数据库开发人员能够编写数据库应用程序，同时，JDBC也是个商标名。（文字来源 - 360 百科）
+  - JDBC 是 Java 针对关系型数据库的底层 API，也是 iBatis（MyBatis）、JDO、Hibernate、JPA 等高层框架的基石。 
+- JDBC 4.0 主要特征
+  - 面向数据表行列编程
+  - 驱动程序需要数据库定制（MySQL、Oracle）
+  - SQL 语法与目标数据库保持一致
+  - 事务（需要数据库支持）
+  - 数据库元信息（数据库信息、表结构信息等） 
+- JDBC 核心 API
+  - 数据源接口 - javax.sql.DataSource
+  - JDBC 驱动接口 - java.sql.Driver
+  - 驱动管理器接口 - java.sql.DriverManager
+  - 数据连接接口 - java.sql.Connection
+  - SQL 命令接口 - java.sql.Statement
+  - SQL 执行结果接口 - java.sql.ResultSet
+  - ResultSet 元数据接口 - java.sql.ResultSetMetaData
+  - SQL 执行异常 - java.sql.SQLException
+  - 事务保护点接口 - java.sql.Savepoint 
+
+
+
+#### 数据源接口 - javax.sql.DataSource
+
+- 获取方式
+  - 普通对象初始化
+    - Spring Bean
+    - API 实现
+  - JNDI 依赖查找 
+- 主流 DataSource 实现
+  - Apache DBCP 1/2
+    - 间接依赖 - Apache Commons Pool
+      - 对象池的概念
+        - “池”化 - “肉少狼多”，“肉”就是资源，“狼”就是“消费者”
+        - 特点：有借有还
+        - 核心编程思想：生产者/消费者模型
+        - 资源：线程资源、数据库资源、I/O 资源
+        - 举例：线程池、数据库连接池
+  - C3P0（字节码提升/优化）
+  - Alibaba Druid（字节码提升/优化） 
+- 多数据源（Multiple DataSources）
+  - 方式一：N个 DataSourses
+  - 方式二：DataSource 代理
+    - Alibaba Druid
+
+
+
+
+
+#### 驱动管理器接口 - java.sql.DriverManager
+
+- 管理器角色
+
+- 获取 Driver 实现
+
+  - 前提：数据库驱动 Driver 实现会显示地调用 java.sql.DriverManager#registerDriver 方法
+  - 1）通过 ClassLoader 加载 Drvier 实现（用户/应用控制）
+  - 2）通过 Java SPI ServiceLoader 获取 Driver 实现
+    - 加载顺序与 Class Path 的顺序有关系
+  - 3）通过 “jdbc.drivers” 系统属性
+    - 加载顺序和属性值的顺序有关系
+  - 通过读取“jdbc.drivers” 系统属性后，再经过 ":" 的分割，尝试获取多值，再通过 ClassLoader 加载对应的实现类
+  - ServiceLoader 会初始化 Driver 实现类（应用主动配置），包含 Class 加载。
+
+- 获取 Connection
+
+  - 通过 ClassLoader 类加载数据库 JDBC Driver 实现类的方式，增加 java.sql.DriverManager#registeredDrivers 字段的元素，然后通过迭代的方式逐一 尝试 getConnection 方法参数的 JDBC URL 是否可用。
+
+- 当多个 Driver 同时被加载到 ClassLoader 后，到底用了哪个？
+
+  - getConnection 方法是通过 JDBC URL 判断的，通过迭代多次，返回第一个成功的 Connection 实例  
+
+- java.sql.DriverManager#loadInitialDrivers 方法中 Java SPI 判断空的意义在哪里？ 
+
+  - ```java
+    try{
+        while(driversIterator.hasNext()) {
+            driversIterator.next();
+        }
+    } catch(Throwable t) {
+    	// Do nothing
+    }
+    ```
+
+  - ServiceLoader#next() 方法会主动触发 ClassLoader 加载。 
+
+
+
+
+
+#### 数据连接接口 - java.sql.Connection
+
+- 相近语义术语
+  - 一个 JDBC Connection 相当于 MyBatis Session 或者 Hibernate Session 
+- 创建SQL命令 - Statement
+
+
+
+
+
+#### SQL 命令接口 - java.sql.Statement
+
+- 主要类型
+  - 普通 SQL 命令 - java.sql.Statement
+  - 预编译 SQL 命令 - java.sql.PreparedStatement
+  - 存储过程 SQL 命令 - java.sql.CallableStatement 
+- DDL 语句和 DML 语句
+  - DML 语句 ：CRUD
+    - R：java.sql.Statement#executeQuery
+    - CUD：java.sql.Statement#executeUpdate(java.lang.String)
+  - DDL 语句
+    - java.sql.Statement#execute(java.lang.String)
+    - 成功的话，不需要返回值（返回值 false）
+    - 失败的话，SQLException 
+
+
+
+
+
+#### ResultSet 元数据接口 - java.sql.ResultSetMetaData
+
+- 列的个数、名称以及类型等
+- 在实现多个版本的时候，可以使用这些信息判断 Major 或者 Minnor 版本号，对应提供什么服务
+
+
+
+
+
+
+
+#### SQL 执行异常 - java.sql.SQLException
+
+- 基本特点
+  - 几乎所有的 JDBC API 操作都需要 try catch java.sql.SQLException
+  - java.sql.SQLException 属于检查类型异常，继承 Exception 
+- 使用 function 实现异常一步处理
+
+
+
+
+
+#### 事务保护点接口 - java.sql.Savepoint 
+
+- 事务
+  - INSERT(S) -> UPDATE(F) -> 回滚
+  - INSERT(S) -> UPDATE(S) -> INSERT(F) -> 部分（T2）回滚
+  - ​    T1                                       T2
+  - 事务：A -> B -> C -> D -> E
+  - ​                              -> Exception -> E 
+- 嵌套事务
+  - T0 = T1 + T2
+  - java.sql.Connection#setSavepoint(java.lang.String)
+  - Savepoint t2 = connection.setSavepoint("T2"); 
+  - 使用保护点，实现事务的部分回滚
+
+
+
+
+
+### 作业
+
+- 通过自研 Web MVC 框架实现（可以自己实现）一个用户注册，forward 到一个成功的页面（JSP 用法）
+  - /register
+- 通过 Controller -> Service -> Repository 实现（数据库实现）
+- （非必须）JDNI 的方式获取数据库源（DataSource），在获取 Connection 
+
+
+
+
+
+### 数据存储之 JPA 
+
+
+
+
+
+
+
+
 
 
 
